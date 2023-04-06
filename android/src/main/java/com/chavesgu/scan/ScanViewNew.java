@@ -197,7 +197,8 @@ public class ScanViewNew extends BarcodeView implements PluginRegistry.RequestPe
         @Override
         protected String doInBackground(Bitmap... params) {
             // 解析二维码/条码
-            return QRCodeDecoder.decodeQRCode(mWeakReference.get().context, params[0]);
+            Map<String, String> result = QRCodeDecoder.decodeQRCode(mWeakReference.get().context, params[0]);
+            return result.get("value");
         }
 
         @Override

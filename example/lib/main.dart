@@ -21,6 +21,7 @@ class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
 
   String qrcode = 'Unknown';
+  String codeType = 'Unknown';
 
   @override
   void initState() {
@@ -61,10 +62,11 @@ class _MyAppState extends State<MyApp> {
                         onPressed: () async {
                           List<Media>? res = await ImagesPicker.pick();
                           if (res != null) {
-                            String? str = await Scan.parse(res[0].path);
-                            if (str != null) {
+                            Map? result = await Scan.parse(res[0].path);
+                            if (result != null && null != result["value"]) {
                               setState(() {
-                                qrcode = str;
+                                qrcode = result["value"];
+                                codeType = result["type"];
                               });
                             }
                           }
@@ -82,6 +84,7 @@ class _MyAppState extends State<MyApp> {
                     ],
                   ),
                   Text('scan result is $qrcode'),
+                  Text('scan result is $codeType')
                 ],
               ),
             ),

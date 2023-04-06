@@ -11,8 +11,8 @@ class Scan {
     return version;
   }
 
-  static Future<String?> parse(String path) async {
-    final String? result = await _channel.invokeMethod('parse', path);
+  static Future<Map?> parse(String path) async {
+    final Map? result = await _channel.invokeMethod('parse', path);
     return result;
   }
 }

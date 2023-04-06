@@ -106,7 +106,7 @@ public class ScanPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwa
   /**
    * AsyncTask 静态内部类，防止内存泄漏
    */
-  static class QrCodeAsyncTask extends AsyncTask<String, Integer, String> {
+  static class QrCodeAsyncTask extends AsyncTask<String, Integer, Map<String, String>> {
     private final WeakReference<ScanPlugin> mWeakReference;
     private final String path;
 
@@ -116,13 +116,13 @@ public class ScanPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwa
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected Map<String, String> doInBackground(String... strings) {
       // 解析二维码/条码
       return QRCodeDecoder.decodeQRCode(mWeakReference.get().flutterPluginBinding.getApplicationContext(), path);
     }
 
     @Override
-    protected void onPostExecute(String s) {
+    protected void onPostExecute(Map<String, String> s) {
       super.onPostExecute(s);
       //识别出图片二维码/条码，内容为s
       ScanPlugin plugin = (ScanPlugin) mWeakReference.get();

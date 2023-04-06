@@ -18,7 +18,12 @@ public class SwiftScanPlugin: NSObject, FlutterPlugin {
       let path = call.arguments as! String;
       if let features = self.detectQRCode(UIImage.init(contentsOfFile: path)), !features.isEmpty {
         let data = features.first as! CIQRCodeFeature
-        result(data.messageString);
+        if (nil != data.messageString) {
+          var scanResult = ["type": "qr", "value": data.messageString]
+          result(scanResult);
+        } else {
+          result(nil);
+        }
       } else {
         self.detectBarCode(UIImage.init(contentsOfFile: path), result: result)
       }
@@ -57,7 +62,12 @@ public class SwiftScanPlugin: NSObject, FlutterPlugin {
           res = data.payloadStringValue;
         }
         DispatchQueue.main.async {
-          result(res);
+          if (nil != res) {
+            var scanResult = ["type": "bar", "value": res]
+            result(scanResult)
+          } else {
+            result(nil);
+          }
         }
       }
       DispatchQueue.global(qos: .background).async {

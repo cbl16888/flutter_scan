@@ -1,5 +1,7 @@
 package com.chavesgu.scan;
 
+import static com.huawei.hms.ml.scan.HmsScanBase.QRCODE_SCAN_TYPE;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,6 +27,7 @@ import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +61,7 @@ public class QRCodeDecoder {
     }};
     public static void config() {
     }
-    public static String syncDecodeQRCode(String path) {
+    public static Map<String, String> syncDecodeQRCode(String path) {
         config();
         Bitmap bitmap = pathToBitMap(path, MAX_PICTURE_PIXEL, MAX_PICTURE_PIXEL);
         int width = bitmap.getWidth();
@@ -66,17 +69,27 @@ public class QRCodeDecoder {
         byte[] mData = getYUV420sp(bitmap.getWidth(), bitmap.getHeight(), bitmap);
 
         Result result = decodeImage(mData, width, height);
-        if (result!=null) return result.getText();
+        if (result!=null) {
+            Map<String, String> map = new HashMap<>();
+            map.put("value", result.getText());
+            map.put("type", result.getBarcodeFormat() == BarcodeFormat.QR_CODE ? "qr" : "bar");
+            return map;
+        }
         return null;
     }
-    public static String syncDecodeQRCode(Bitmap bitmap) {
+    public static Map<String, String> syncDecodeQRCode(Bitmap bitmap) {
         config();
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         byte[] mData = getYUV420sp(bitmap.getWidth(), bitmap.getHeight(), bitmap);
 
         Result result = decodeImage(mData, width, height);
-        if (result!=null) return result.getText();
+        if (result!=null) {
+            Map<String, String> map = new HashMap<>();
+            map.put("value", result.getText());
+            map.put("type", result.getBarcodeFormat() == BarcodeFormat.QR_CODE ? "qr" : "bar");
+            return map;
+        }
         return null;
     }
 
@@ -215,7 +228,7 @@ public class QRCodeDecoder {
     }
 
 
-    public static String decodeQRCode(Context context, String path) {
+    public static Map<String, String> decodeQRCode(Context context, String path) {
         BitmapFactory.Options sizeOptions = new BitmapFactory.Options();
         sizeOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, sizeOptions);
@@ -230,17 +243,23 @@ public class QRCodeDecoder {
         HmsScan[] hmsScans = ScanUtil.decodeWithBitmap(context, bitmap, options);
 
         if (hmsScans != null && hmsScans.length > 0) {
-            return hmsScans[0].getOriginalValue();
+            Map<String, String> map = new HashMap<>();
+            map.put("value", hmsScans[0].getOriginalValue());
+            map.put("type", hmsScans[0].scanType == QRCODE_SCAN_TYPE ? "qr" : "bar");
+            return map;
         }
         return syncDecodeQRCode(path);
     }
 
-    public static String decodeQRCode(Context context, Bitmap bitmap) {
+    public static Map<String, String> decodeQRCode(Context context, Bitmap bitmap) {
         HmsScanAnalyzerOptions options = new HmsScanAnalyzerOptions.Creator().setPhotoMode(true).create();
         HmsScan[] hmsScans = ScanUtil.decodeWithBitmap(context, bitmap, options);
 
         if (hmsScans != null && hmsScans.length > 0) {
-            return hmsScans[0].getOriginalValue();
+            Map<String, String> map = new HashMap<>();
+            map.put("value", hmsScans[0].getOriginalValue());
+            map.put("type", hmsScans[0].scanType == QRCODE_SCAN_TYPE ? "qr" : "bar");
+            return map;
         }
         return syncDecodeQRCode(bitmap);
     }
